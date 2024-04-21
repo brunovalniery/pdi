@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--[if IE
+      ]><meta http-equiv="X-UA-Compatible" content="IE=edge"
+    /><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content="Asciidoctor 1.5.4" />
+    <title>Processamento Digital de Imagens</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"
+    />
+    <link
+      rel="stylesheet"
+      href="/pdi/stylesheet.css"
+    />
+    
+  </head>
+  <body class="article toc2 toc-left">
+    <div id="header">
+      <h1>Processamento Digital de Imagens</h1>
+      <div id="toc" class="toc2">
+        <div id="toctitle">Table of Contents</div>
+        <ul class="sectlevel2">
+          <li><a href="#_atividade_3_1">Atividade 3.1</a></li>
+          <li><a href="#_atividade_3_2">Atividade 3.2</a></li>
+          <li><a href="#_atividade_4_1">Atividade 4.1</a></li>
+          <li><a href="#_atividade_4_2">Atividade 4.2</a></li>
+          <li><a href="#_atividade_5_1">Atividade 5.1</a></li>
+          <li><a href="#_atividade_5_2">Atividade 5.2</a></li>
+          <li><a href="#_atividade_6_1">Atividade 6.1</a></li>
+          <li><a href="#_atividade_8_2">Atividade 8.2</a></li>
+          <li><a href="#_atividade_11_1">Atividade 11.1</a></li>
+          <li><a href="#_bibliografia">Bibliografia</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="content">
+      <div id="preamble">
+        <div class="sectionbody">
+          <div class="paragraph">
+            <p>
+              Bruno Valniery Gomes de Sousa &lt;<a
+                href="mailto:brunovalniery@gmail.com"
+                >brunovalniery@gmail.com</a
+              >&gt;
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_3_1">Atividade 3.1</h3>
+        <div class="paragraph">
+          <p>
+            Programa que solicita do usuário as coordenadas de dois pontos P1 e
+            P2 dentro dos limites da imagem. Com isso, o retângulo limitado
+            pelos pontos P1 e P2 mostrará o negativo da imagem na região
+            correspondente. Esse negativo é feito pegando a imagem em escala de
+            cinza e atribuindo a cada pixel o valor de 255, maior valor em
+            escala de cinza, menos o valor atual do pixel.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="NegativoRegiao.cpp" class="bare">NegativoRegiao.cpp</a>
+            está mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;cv.h&gt;
+#include &lt;highgui.h&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int, char**){
+  Mat image;
+  Vec3b val;
+  CvPoint p1, p2;
+
+  cout &lt;&lt; "Digite as coordenadas do ponto P1:" &lt;&lt; endl;
+  cin &gt;&gt; p1.x;
+  cin &gt;&gt; p1.y;
+
+  cout &lt;&lt; "Digite as coordenadas do ponto P2:" &lt;&lt; endl;
+  cin &gt;&gt; p2.x;
+  cin &gt;&gt; p2.y;
+
+  image= imread("biel.png",CV_LOAD_IMAGE_GRAYSCALE);
+  if(!image.data)
+    cout &lt;&lt; "Nao abriu biel.png" &lt;&lt; endl;
+
+  namedWindow("janela",WINDOW_AUTOSIZE);
+
+  for(int i= p1.x;i&lt;p2.x;i++){
+    for(int j=p1.y;j&lt;p2.y;j++){
+      image.at&lt;uchar&gt;(i,j) = (255 - image.at&lt;uchar&gt;(i,j));
+    }
+  }
+
+  imshow("janela", image);
+  waitKey();
+  imwrite("saidaNegativoRegiao.png", image);
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Abaixo encontram-se as imagens de entrada e saída respectivamente.
+          </p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="biel.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 1. Entrada dos programas 3.1 e 3.2</div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="saidaNegativoRegiao.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 2. Saída do programa</div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_3_2">Atividade 3.2</h3>
+        <div class="paragraph">
+          <p>
+            Programa divide a image em quatro partes e misturar como se fosse um
+            quebra-cabeças. Para isto ser feito, foi necessário criar uma matriz
+            auxiliar e percorrer as duas matrizes de imagem quatro vezes,
+            atribuindo o valor dos pixels de uma na posição trocada na outra
+            martiz. O primeiro conjunto de dois "for" que percorrem as matrizes
+            percorre a primeira matriz da linha e coluna zero até a metade do
+            número de linhas e metade do número de colunas, colocando esses
+            pixels nas linhas e colunas da segunda matriz que são percorridas da
+            metade do número de linhas e colunas até as últimas linhas e
+            colunas. Nos outros "for" a idéia é a mesma, mas apenas alterando os
+            limites para percorrer nas respectivas matrizes.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="trocaregioes.cpp" class="bare">trocaregioes.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int, char**){
+  Mat image, imageAux;
+  Vec3b val;
+
+  image= imread("biel.png",CV_LOAD_IMAGE_GRAYSCALE);
+  imageAux = image.clone();
+
+  if(!image.data)
+    cout &lt;&lt; "nao abriu biel.png" &lt;&lt; endl;
+
+  namedWindow("janela",WINDOW_AUTOSIZE);
+
+  for(int i=0, i1=(image.rows/2)  ; i&lt;(image.rows/2), i1&lt;image.rows; i++, i1++){
+    for(int j=0, j1=(image.cols/2); j&lt;(image.cols/2), j1&lt;image.cols; j++, j1++){
+      imageAux.at&lt;uchar&gt;(i1,j1) = image.at&lt;uchar&gt;(i,j);
+    }
+  }
+
+  for(int i=(image.rows/2), i1=0  ; i&lt;(image.rows), i1&lt;(image.rows/2); i++, i1++){
+    for(int j=0, j1=(image.cols/2); j&lt;(image.cols/2), j1&lt;image.cols  ; j++, j1++){
+      imageAux.at&lt;uchar&gt;(i1,j1) = image.at&lt;uchar&gt;(i,j);
+    }
+  }
+
+  for(int i=0, i1=(image.rows/2)  ; i&lt;(image.rows/2), i1&lt;(image.rows); i++, i1++){
+    for(int j=(image.cols/2), j1=0; j&lt;(image.cols), j1&lt;(image.cols/2); j++, j1++){
+      imageAux.at&lt;uchar&gt;(i1,j1) = image.at&lt;uchar&gt;(i,j);
+    }
+  }
+
+  for(int i=(image.rows/2), i1=0  ; i&lt;(image.rows), i1&lt;(image.rows/2); i++, i1++){
+    for(int j=(image.cols/2), j1=0; j&lt;(image.cols), j1&lt;(image.cols/2); j++, j1++){
+      imageAux.at&lt;uchar&gt;(i1,j1) = image.at&lt;uchar&gt;(i,j);
+    }
+  }
+
+  imshow("janela", imageAux);
+  waitKey();
+  imwrite("trocaregioes.png", imageAux);
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>Abaixo encontra-se a imagem de saída.</p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="trocaregioes.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 3. Saída do programa</div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_4_1">Atividade 4.1</h3>
+        <div class="paragraph">
+          <p>
+            Programa para realizar a contagem dos objetos na cena se caso
+            existam mais de 255 objetos na cena. Para essa contagem ser
+            efetuada, precisamos sair enumerando todos os objetos de cor
+            diferente da do fundo da imagem com cores acrescidas de um em um,
+            contagem feita utilizando a função floodFill. Porém ao chegar no
+            valor de 254 devemos pular a cor para o valor de 256 para evitarmos
+            misturar os objetos com tom de cinza 255, após o término da
+            contagem, só é necessário subtrair um caso o número de objetos seja
+            maior que 254.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="contarmaisde255.cpp" class="bare">contarmaisde255.cpp</a>
+            está mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv){
+  Mat image, mask;
+  int width, height;
+  int nobjects;
+
+  CvPoint p;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+
+  if(!image.data){
+    cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }
+  width=image.size().width;
+  height=image.size().height;
+
+  p.x=0;
+  p.y=0;
+
+  // busca objetos com buracos presentes
+  nobjects=0;
+  for(int i=0; i&lt;height; i++){
+    for(int j=0; j&lt;width; j++){
+      if(image.at&lt;uchar&gt;(i,j) == 255){
+		    // achou um objeto
+        if(nobjects == 254)//Nao deixar mudar tudo para a cor 255
+          nobjects++;
+
+		    nobjects++;
+		    p.x=j;
+		    p.y=i;
+		    floodFill(image,p,nobjects);
+      }
+    }
+  }
+  if(nobjects &gt; 254)
+    cout &lt;&lt; "Numero de objetos: " &lt;&lt; nobjects-1 &lt;&lt; endl;
+  else
+    cout &lt;&lt; "Numero de objetos: " &lt;&lt; nobjects &lt;&lt; endl;
+  imshow("image", image);
+  imwrite("labeling.png", image);
+  waitKey();
+  imwrite("contarmaisde255.png", image);
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Abaixo encontram-se as imagens de entrada e saída respectivamente.
+          </p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="bolhas.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 4. Entrada dos programas 4.1 e 4.2</div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="contarmaisde255.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 5. Saída do programa</div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_4_2">Atividade 4.2</h3>
+        <div class="paragraph">
+          <p>
+            Algoritmo para contar as bolhas que possuem buracos e as que não
+            possuem buracos, eliminando as que tocam as bordas, pois a princípio
+            não podemos dizer se estas possuem ou não buracos. Para fazer a
+            eliminação das bolhas que tocam as bordas, precisamos apenas aplicar
+            um floodFill com o valor do fundo da imagem em todos os pontos da
+            primeira e última linhas e coluna. Para contar as bolhas com buraco,
+            foi preciso primeiro contar a quantidade de bolhas. Depois disso é
+            necessário percorrer a imagem fazendo um decréscimo nas imagens que
+            já forem sendo contadas com buraco, e no final só é necessário
+            subtrair o número de com buraco do número de bolhas total.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="contarburacos.cpp" class="bare">contarburacos.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv){
+  Mat image, mask;
+  int width, height;
+  int nobjects = 0;
+  int nburaco = 0;
+  int ultimo = 0;
+
+  CvPoint p,p1;
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+
+  if(!image.data){
+    cout &lt;&lt; "imagem nao carregou corretamente\n";
+    return(-1);
+  }
+  width=image.size().width;
+  height=image.size().height;
+
+  p.x=0;
+  p.y=0;
+
+  p1.x=0;
+  p1.y=0;
+
+  //Inicia retirada de bolhas na borda
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,0) != 0){
+      p.x=0;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+
+  for(int i=0; i&lt;height; i++){
+    if(image.at&lt;uchar&gt;(i,(width-1)) != 0){
+      p.x=width-1;
+      p.y=i;
+      floodFill(image,p,0);
+    }
+  }
+
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;(0,i) != 0){
+      p.x=i;
+      p.y=0;
+      floodFill(image,p,0);
+    }
+  }
+
+  for(int i=0; i&lt;width; i++){
+    if(image.at&lt;uchar&gt;((height-1),i) != 0){
+      p.x=i;
+      p.y=height-1;
+      floodFill(image,p,0);
+    }
+  }//Termina retirada de bolhas da borda
+
+  p.x=0;
+  p.y=0;
+
+  //busca objetos
+  nobjects=0;
+  for(int i=0; i&lt;height; i++){
+    for(int j=0; j&lt;width; j++){
+      if(image.at&lt;uchar&gt;(i,j) == 255){
+		    // achou um objeto
+   	    nobjects++;
+		    p.x=j;
+		    p.y=i;
+		    floodFill(image,p,nobjects);
+      }
+    }
+  }
+  //Mudar cor do fundo
+  floodFill(image,p1,nobjects+1);
+
+  //Encontrar buracos
+  bool tburaco = false;
+  for(int k=nobjects; k&gt;0; k--){
+    for(int i=0; i&lt;height; i++){
+      for(int j=0; j&lt;width; j++){
+        if(ultimo == k){
+          if(image.at&lt;uchar&gt;(i,j) == 0){
+            tburaco = true;
+            p.x=j;
+            p.y=i;
+            floodFill(image,p,k+nobjects+1);
+          }
+        }
+        ultimo = image.at&lt;uchar&gt;(i,j);
+      }
+    }
+    if(tburaco)
+      nburaco++;
+    tburaco = false;
+  }
+
+  cout &lt;&lt; "Numero de bolhas total: " &lt;&lt; nobjects &lt;&lt; endl;
+  cout &lt;&lt; "Numero de bolhas sem buraco: " &lt;&lt; nobjects - nburaco &lt;&lt; endl;
+  cout &lt;&lt; "Numero de bolhas com buraco: " &lt;&lt; nburaco &lt;&lt; endl;
+  imshow("image", image);
+  imwrite("contarburacos.png", image);
+  waitKey();
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            Abaixo encontra-se a imagem de saída.
+            image::contarburacos.png[Entrada do Programa, title="Saída do
+            programa"]
+          </p>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_5_1">Atividade 5.1</h3>
+        <div class="paragraph">
+          <p>
+            Algoritmo que tem como objetivo equalizar a imagem capturada.
+            Primeira coisa que foi feita foi converter a imagem capturada para
+            escala de cinza para ficar mais fácil de ser manipulada e depois
+            disso foi utilizado o filtro equalizeHist para equalizar a imagem
+            para depois ser exibida lado a lado da imagem original.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="equalize.cpp" class="bare">equalize.cpp</a> está mostrado
+            abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv){
+  Mat image, saida;
+  VideoCapture cap;
+  vector&lt;Mat&gt; planes;
+
+  cap.open(0);
+
+  if(!cap.isOpened()){
+    cout &lt;&lt; "cameras indisponiveis";
+    return -1;
+  }
+
+  while(1){
+    cap &gt;&gt; image;
+    split (image, planes);
+
+    cvtColor(image, image, CV_BGR2GRAY);
+
+    equalizeHist(image, saida);
+
+    imshow("image", image);
+    imshow("equalizada", saida);
+    if(waitKey(30) &gt;= 0) break;
+  }
+  imwrite("entradaEqualize.png", image);
+  imwrite("saidaEqualize.png", saida);
+
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_5_2">Atividade 5.2</h3>
+        <div class="paragraph">
+          <p>
+            Algoritmo que tem como objetivo implementar um filtro que seja capaz
+            de detectar movimento na imagem utilizando um método de comparação
+            das diferenças entre as imagens. Nesse algoritmo é feito o
+            histograma da imagem, e dentro do while é feita mais uma captura de
+            imagem e tirado o histograma da mesma, para obtermos duas imagens de
+            tempos diferentes e compararmos. Dentro desse while, é feita a soma
+            da diferença absoluta dos histogramas para ter a quantidade de
+            mudança entres as imagens.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="motiondetector.cpp" class="bare">motiondetector.cpp</a>
+            está mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv){
+  Mat image;
+  //int width, height;
+  VideoCapture cap;
+  vector&lt;Mat&gt; planes;
+  Mat hist, histAux;
+  int nbins = 64;
+  float range[] = {0, 256};
+  const float *histrange = { range };
+  bool uniform = true;
+  bool acummulate = false;
+
+  cap.open(0);
+
+  if(!cap.isOpened()){
+    cout &lt;&lt; "cameras indisponiveis";
+    return -1;
+  }
+
+  cap &gt;&gt; image;
+  split (image, planes);
+
+  calcHist(&amp;planes[0], 1, 0, Mat(), hist, 1,
+           &amp;nbins, &amp;histrange,
+           uniform, acummulate);
+
+  while(1){
+    cap &gt;&gt; image;
+    split (image, planes);
+
+    calcHist(&amp;planes[0], 1, 0, Mat(), histAux, 1,
+             &amp;nbins, &amp;histrange,
+             uniform, acummulate);
+
+    float somador = 0;
+
+    for(int i=0; i&lt;nbins; i++){
+        somador = somador + abs(cvRound(hist.at&lt;float&gt;(i)) - cvRound(histAux.at&lt;float&gt;(i)));
+    }
+// Esse valor vai de acordo com a qualidade da sua camera, quanto mais ruido maior deve ser
+    if(somador &gt; (20000)){
+      cout &lt;&lt; "Alerta de Intruso!!!" &lt;&lt; endl;
+    }
+
+    hist = histAux.clone();
+
+    imshow("image", image);
+    if(waitKey(30) &gt;= 0) break;
+  }
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_6_1">Atividade 6.1</h3>
+        <div class="paragraph">
+          <p>
+            Algoritmo que possui um menu com várias opções de filtro: a -
+            Calcular módulo; m - Media; g - Gauss; v - Verticals; h -
+            Horizontal; l - Laplaciano; k - Glaussiano depois laplaciano; esc -
+            sair.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            Algoritmo cuja a opção 'k' passa um filtro Gaussiano e depois um
+            filtro Laplaciano. Para esse procedimento de passar dois filtros ser
+            efetuado, foi necessário a criação de uma flag para quando opção "k"
+            for escolhida, seja aplicada o filtro da gaussiana e posteriormente
+            o código entre em um condicional if e assim o resultado da filtragem
+            da gaussiana passe pelo filtro do laplaciano, obtendo desta forma o
+            filtro do laplaciano do gaussiano.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="laplalgauss.cpp" class="bare">laplalgauss.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+
+using namespace cv;
+using namespace std;
+
+void printmask(Mat &amp;m){
+  for(int i=0; i&lt;m.size().height; i++){
+    for(int j=0; j&lt;m.size().width; j++){
+      cout &lt;&lt; m.at&lt;float&gt;(i,j) &lt;&lt; ",";
+    }
+    cout &lt;&lt; endl;
+  }
+}
+
+void menu(){
+  cout &lt;&lt; "\npressione a tecla para ativar o filtro: \n"
+          "a - calcular modulo\n"
+          "m - media\n"
+          "g - gauss\n"
+          "v - vertical\n"
+          "h - horizontal\n"
+          "l - laplaciano\n"
+          "k - glaussiano depois laplaciano\n"
+	         "esc - sair\n";
+}
+
+int main(int argvc, char** argv){
+  VideoCapture video;
+  float media[] = {1,1,1,
+				            1,1,1,
+				            1,1,1};
+  float gauss[] = {1,2,1,
+				            2,4,2,
+				            1,2,1};
+  float horizontal[]={-1,0,1,
+					           -2,0,2,
+					           -1,0,1};
+  float vertical[]={-1,-2,-1,
+					           0,0,0,
+					           1,2,1};
+  float laplacian[]={0,-1,0,
+					           -1,4,-1,
+					           0,-1,0};
+
+  Mat cap, frame, frame32f, frameFiltered;
+  Mat mask(3,3,CV_32F), mask1;
+  Mat result, result1;
+  double width, height;
+  int absolut;
+  char key;
+  bool secondfilter = false;
+
+  video.open(0);
+  if(!video.isOpened())
+    return -1;
+  width=video.get(CV_CAP_PROP_FRAME_WIDTH);
+  height=video.get(CV_CAP_PROP_FRAME_HEIGHT);
+  std::cout &lt;&lt; "largura=" &lt;&lt; width &lt;&lt; "\n";;
+  std::cout &lt;&lt; "altura =" &lt;&lt; height&lt;&lt; "\n";;
+
+  namedWindow("filtroespacial",1);
+
+  mask = Mat(3, 3, CV_32F, media);
+  scaleAdd(mask, 1/9.0, Mat::zeros(3,3,CV_32F), mask1);
+  swap(mask, mask1);
+  absolut=1; // calcs abs of the image
+
+  menu();
+  for(;;){
+    video &gt;&gt; cap;
+    cvtColor(cap, frame, CV_BGR2GRAY);
+    flip(frame, frame, 1);
+    imshow("original", frame);
+    frame.convertTo(frame32f, CV_32F);
+    filter2D(frame32f, frameFiltered, frame32f.depth(), mask, Point(1,1), 0);
+    if(absolut){
+      frameFiltered=abs(frameFiltered);
+    }
+    frameFiltered.convertTo(result, CV_8U);
+    imshow("filtroespacial", result);
+
+    if(secondfilter){
+      mask = Mat(3, 3, CV_32F, laplacian);
+      filter2D(frameFiltered, frameFiltered, frame32f.depth(), mask, Point(1,1), 0);
+      if(absolut){
+        frameFiltered=abs(frameFiltered);
+      }
+      frameFiltered.convertTo(result, CV_8U);
+      imshow("filtroespacial", result);
+    }
+
+    key = (char) waitKey(10);
+    if( key == 27 ) break; // esc pressed!
+    switch(key){
+    case 'a':
+	  menu();
+      absolut=!absolut;
+      break;
+    case 'm':
+	  menu();
+      mask = Mat(3, 3, CV_32F, media);
+      scaleAdd(mask, 1/9.0, Mat::zeros(3,3,CV_32F), mask1);
+      mask = mask1;
+      printmask(mask);
+      break;
+    case 'g':
+	  menu();
+      mask = Mat(3, 3, CV_32F, gauss);
+      scaleAdd(mask, 1/16.0, Mat::zeros(3,3,CV_32F), mask1);
+      mask = mask1;
+      printmask(mask);
+      break;
+    case 'h':
+	  menu();
+      mask = Mat(3, 3, CV_32F, horizontal);
+      printmask(mask);
+      break;
+    case 'v':
+	  menu();
+      mask = Mat(3, 3, CV_32F, vertical);
+      printmask(mask);
+      break;
+    case 'l':
+	  menu();
+      mask = Mat(3, 3, CV_32F, laplacian);
+      printmask(mask);
+      break;
+    case 'k':
+    menu();
+      secondfilter = !secondfilter;
+      mask = Mat(3, 3, CV_32F, gauss);
+      scaleAdd(mask, 1/16.0, Mat::zeros(3,3,CV_32F), mask1);
+      mask = mask1;
+      printmask(mask);
+      break;
+    default:
+      break;
+    }
+  }
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_8_2">Atividade 8.2</h3>
+        <div class="paragraph">
+          <p>
+            Este algoritmo tem como objetivo usar o exemplo da DFT (Transformada
+            Discreta de Fourier) para criar um filtro Homomórfico, o código da
+            DFT é <a href="dft.cpp" class="bare">dft.cpp</a>. O filtro
+            Homomórfico tem como finalidade melhorar imagens com iluminação
+            irregular.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte <a href="dft.cpp" class="bare">dft.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;opencv2/imgproc/imgproc.hpp&gt;
+
+#define RADIUS 20
+
+using namespace cv;
+using namespace std;
+
+// troca os quadrantes da imagem da DFT
+void deslocaDFT(Mat&amp; image ){
+  Mat tmp, A, B, C, D;
+
+  // se a imagem tiver tamanho impar, recorta a regiao para
+  // evitar cópias de tamanho desigual
+  image = image(Rect(0, 0, image.cols &amp; -2, image.rows &amp; -2));
+  int cx = image.cols/2;
+  int cy = image.rows/2;
+
+  // reorganiza os quadrantes da transformada
+  // A B   -&gt;  D C
+  // C D       B A
+  A = image(Rect(0, 0, cx, cy));
+  B = image(Rect(cx, 0, cx, cy));
+  C = image(Rect(0, cy, cx, cy));
+  D = image(Rect(cx, cy, cx, cy));
+
+  // A &lt;-&gt; D
+  A.copyTo(tmp);  D.copyTo(A);  tmp.copyTo(D);
+
+  // C &lt;-&gt; B
+  C.copyTo(tmp);  B.copyTo(C);  tmp.copyTo(B);
+}
+
+int main(int , char**){
+  VideoCapture cap;
+  Mat imaginaryInput, complexImage, multsp;
+  Mat padded, filter, mag;
+  Mat image, imagegray, tmp;
+  Mat_&lt;float&gt; realInput, zeros;
+  vector&lt;Mat&gt; planos;
+
+  // habilita/desabilita ruido
+  int noise=0;
+  // frequencia do ruido
+  int freq=10;
+  // ganho inicial do ruido
+  float gain=1;
+
+  // valor do ruido
+  float mean;
+
+  // guarda tecla capturada
+  char key;
+
+  // valores ideais dos tamanhos da imagem
+  // para calculo da DFT
+  int dft_M, dft_N;
+
+  // abre a câmera default
+  cap.open(0);
+  if(!cap.isOpened())
+    return -1;
+
+  // captura uma imagem para recuperar as
+  // informacoes de gravação
+  cap &gt;&gt; image;
+
+  // identifica os tamanhos otimos para
+  // calculo do FFT
+  dft_M = getOptimalDFTSize(image.rows);
+  dft_N = getOptimalDFTSize(image.cols);
+
+  // realiza o padding da imagem
+  copyMakeBorder(image, padded, 0,
+                 dft_M - image.rows, 0,
+                 dft_N - image.cols,
+                 BORDER_CONSTANT, Scalar::all(0));
+
+  // parte imaginaria da matriz complexa (preenchida com zeros)
+  zeros = Mat_&lt;float&gt;::zeros(padded.size());
+
+  // prepara a matriz complexa para ser preenchida
+  complexImage = Mat(padded.size(), CV_32FC2, Scalar(0));
+
+  // a função de transferência (filtro frequencial) deve ter o
+  // mesmo tamanho e tipo da matriz complexa
+  filter = complexImage.clone();
+
+  // cria uma matriz temporária para criar as componentes real
+  // e imaginaria do filtro ideal
+  tmp = Mat(dft_M, dft_N, CV_32F);
+
+  // prepara o filtro passa-baixas ideal
+  for(int i=0; i&lt;dft_M; i++){
+    for(int j=0; j&lt;dft_N; j++){
+      if((i-dft_M/2)*(i-dft_M/2)+(j-dft_N/2)*(j-dft_N/2) &lt; RADIUS*RADIUS){
+        tmp.at&lt;float&gt; (i,j) = 1.0;
+      }
+    }
+  }
+
+  // cria a matriz com as componentes do filtro e junta
+  // ambas em uma matriz multicanal complexa
+  Mat comps[]= {tmp, tmp};
+  merge(comps, 2, filter);
+
+  for(;;){
+    cap &gt;&gt; image;
+    cvtColor(image, imagegray, CV_BGR2GRAY);
+    imshow("original", imagegray);
+
+    // realiza o padding da imagem
+    copyMakeBorder(imagegray, padded, 0,
+                   dft_M - image.rows, 0,
+                   dft_N - image.cols,
+                   BORDER_CONSTANT, Scalar::all(0));
+
+    // limpa o array de matrizes que vao compor a
+    // imagem complexa
+    planos.clear();
+    // cria a compoente real
+    realInput = Mat_&lt;float&gt;(padded);
+    // insere as duas componentes no array de matrizes
+    planos.push_back(realInput);
+    planos.push_back(zeros);
+
+    // combina o array de matrizes em uma unica
+    // componente complexa
+    merge(planos, complexImage);
+
+    // calcula o dft
+    dft(complexImage, complexImage);
+
+    // realiza a troca de quadrantes
+    deslocaDFT(complexImage);
+
+    // aplica o filtro frequencial
+    mulSpectrums(complexImage,filter,complexImage,0);
+
+    // limpa o array de planos
+    planos.clear();
+    // separa as partes real e imaginaria para modifica-las
+    split(complexImage, planos);
+
+    // usa o valor medio do espectro para dosar o ruido
+    mean = abs(planos[0].at&lt;float&gt; (dft_M/2,dft_N/2));
+
+    // insere ruido coerente, se habilitado
+    if(noise){
+      // F(u,v) recebe ganho proporcional a F(0,0)
+      planos[0].at&lt;float&gt;(dft_M/2 +freq, dft_N/2 +freq) +=
+        gain*mean;
+
+      planos[1].at&lt;float&gt;(dft_M/2 +freq, dft_N/2 +freq) +=
+        gain*mean;
+
+      // F*(-u,-v) = F(u,v)
+      planos[0].at&lt;float&gt;(dft_M/2 -freq, dft_N/2 -freq) =
+        planos[0].at&lt;float&gt;(dft_M/2 +freq, dft_N/2 +freq);
+
+      planos[1].at&lt;float&gt;(dft_M/2 -freq, dft_N/2 -freq) =
+        -planos[1].at&lt;float&gt;(dft_M/2 +freq, dft_N/2 +freq);
+
+    }
+
+    // recompoe os planos em uma unica matriz complexa
+    merge(planos, complexImage);
+
+    // troca novamente os quadrantes
+    deslocaDFT(complexImage);
+
+	cout &lt;&lt; complexImage.size().height &lt;&lt; endl;
+    // calcula a DFT inversa
+    idft(complexImage, complexImage);
+
+    // limpa o array de planos
+    planos.clear();
+
+    // separa as partes real e imaginaria da
+    // imagem filtrada
+    split(complexImage, planos);
+
+    // normaliza a parte real para exibicao
+    normalize(planos[0], planos[0], 0, 1, CV_MINMAX);
+    imshow("filtrada", planos[0]);
+
+    key = (char) waitKey(10);
+    if( key == 27 ) break; // esc pressed!
+    switch(key){
+      // aumenta a frequencia do ruido
+    case 'q':
+      freq=freq+1;
+      if(freq &gt; dft_M/2-1)
+        freq = dft_M/2-1;
+      break;
+      // diminui a frequencia do ruido
+    case 'a':
+      freq=freq-1;
+      if(freq &lt; 1)
+        freq = 1;
+      break;
+      // amplifica o ruido
+    case 'x':
+      gain += 0.1;
+      break;
+      // atenua o ruido
+    case 'z':
+      gain -= 0.1;
+      if(gain &lt; 0)
+        gain=0;
+      break;
+      // insere/remove ruido
+    case 'e':
+      noise=!noise;
+      break;
+    }
+  }
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            A imagem que passou por esse processo de filtragem é a
+            <a href="CarroEscuro.png" class="bare">CarroEscuro.png</a>, mostrada
+            logo abaixo, em seguida temos a imagem de saída do programa
+            <a href="filtrada.png" class="bare">filtrada.png</a>
+          </p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="CarroEscuro.png" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 6. Entrada do programa</div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="filtrada.png" alt="Saída do Programa" />
+          </div>
+          <div class="title">Figure 7. Saída do programa</div>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="filtroHomomórfico.cpp" class="bare"
+              >filtroHomomórfico.cpp</a
+            >
+            está mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;opencv2/imgproc/imgproc.hpp&gt;
+
+#define gamaL_slider_max 100
+#define gamaH_slider_max 100
+#define d_slider_max     100
+#define c_slider_max     100
+
+using namespace cv;
+using namespace std;
+
+Mat image, padded, imagegray, tmp, filtrada, complexImage, res;
+Mat_&lt;float&gt; realInput, zeros;
+vector&lt;Mat&gt; planos;
+
+int dft_M, dft_N, gamaL_slider, gamaH_slider, d_slider, c_slider;
+float c, d, gamaH, gamaL;
+
+char key;
+
+// troca os quadrantes da imagem da DFT
+void deslocaDFT(Mat&amp; image ){
+  Mat tmp, A, B, C, D;
+
+  // se a imagem tiver tamanho impar, recorta a regiao para
+  // evitar cópias de tamanho desigual
+  image = image(Rect(0, 0, image.cols &amp; -2, image.rows &amp; -2));
+  int cx = image.cols/2;
+  int cy = image.rows/2;
+
+  // reorganiza os quadrantes da transformada
+  // A B   -&gt;  D C
+  // C D       B A
+  A = image(Rect(0, 0, cx, cy));
+  B = image(Rect(cx, 0, cx, cy));
+  C = image(Rect(0, cy, cx, cy));
+  D = image(Rect(cx, cy, cx, cy));
+
+  // A &lt;-&gt; D
+  A.copyTo(tmp);  D.copyTo(A);  tmp.copyTo(D);
+  // C &lt;-&gt; B
+  C.copyTo(tmp);  B.copyTo(C);  tmp.copyTo(B);
+}
+
+void Filtro(int, void*){
+  int dft_M, dft_N;
+
+  dft_M = tmp.size().height;
+  dft_N = tmp.size().width;
+
+  gamaL = gamaL_slider / 10.0;
+  gamaH = gamaH_slider / 10.0;
+  d     = d_slider / 10.0;
+  c     = c_slider / 10.0;
+
+  // prepara o filtro passa-baixas ideal
+  for(int i=0; i&lt;dft_M; i++){
+    for(int j=0; j&lt;dft_N; j++){
+      tmp.at&lt;float&gt; (i,j) = (gamaH - gamaL) *
+      (1 - exp(-1 * c * (pow(i - dft_M/2, 2) +
+      pow(j - dft_N/2, 2))/pow(d,2))) + gamaL;
+    }
+  }
+
+  // cria a matriz com as componentes do filtro e junta
+  // ambas em uma matriz multicanal complexa
+  Mat comps[]= {tmp, tmp};
+  merge(comps, 2, filtrada);
+}
+
+int main(int argc, char** argv){
+
+  namedWindow("filtrada", CV_WINDOW_AUTOSIZE);
+  createTrackbar("Valor gamaH",
+                "filtrada",
+                &amp;gamaH_slider,
+                gamaH_slider_max,
+                Filtro);
+  createTrackbar("Valor gamaL",
+                "filtrada",
+                &amp;gamaL_slider,
+                gamaL_slider_max,
+                Filtro);
+  createTrackbar("Valor d",
+                "filtrada",
+                &amp;d_slider,
+                d_slider_max,
+                Filtro);
+  createTrackbar("Valor c",
+                "filtrada",
+                &amp;c_slider,
+                c_slider_max,
+                Filtro);
+
+  // carregar imagem
+  image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
+
+  if(!image.data){
+    cout &lt;&lt; "Nao abriu: " &lt;&lt; argv[1] &lt;&lt; endl;
+    cout &lt;&lt; argv[0] &lt;&lt; " imagem.jpg";
+    exit(0);
+  }
+
+  // identifica os tamanhos otimos para
+  // calculo do FFT
+  dft_M = getOptimalDFTSize(image.rows);
+  dft_N = getOptimalDFTSize(image.cols);
+
+  // realiza o padding da imagem
+  copyMakeBorder(image, padded, 0,
+                 dft_M - image.rows, 0,
+                 dft_N - image.cols,
+                 BORDER_CONSTANT, Scalar::all(0));
+
+  // parte imaginaria da matriz complexa (preenchida com zeros)
+  zeros = Mat_&lt;float&gt;::zeros(padded.size());
+
+  // prepara a matriz complexa para ser preenchida
+  complexImage = Mat(padded.size(), CV_32FC2, Scalar(0));
+
+  // a função de transferência (filtro frequencial) deve ter o
+  // mesmo tamanho e tipo da matriz complexa
+  filtrada = complexImage.clone();
+
+  // cria uma matriz temporária para criar as componentes real
+  // e imaginaria do filtro ideal
+  tmp = Mat(dft_M, dft_N, CV_32F);
+
+  for(;;){
+    imagegray = image.clone();
+    imshow("original", imagegray);
+
+    // realiza o padding da imagem
+    copyMakeBorder(imagegray, padded, 0,
+                   dft_M - image.rows, 0,
+                   dft_N - image.cols,
+                   BORDER_CONSTANT, Scalar::all(0));
+
+    // limpa o array de matrizes que vao compor a
+    // imagem complexa
+    planos.clear();
+    // cria a compoente real
+    realInput = Mat_&lt;float&gt;(padded);
+
+    //calculando o logaritmo da imagem
+    log(realInput, realInput);
+
+    // insere as duas componentes no array de matrizes
+    planos.push_back(realInput);
+    planos.push_back(zeros);
+
+    // combina o array de matrizes em uma unica
+    // componente complexa
+    merge(planos, complexImage);
+
+    // calcula o dft
+    dft(complexImage, complexImage);
+
+    // realiza a troca de quadrantes
+    deslocaDFT(complexImage);
+
+    // aplica o filtro frequencial
+    mulSpectrums(complexImage,filtrada,complexImage,0);
+
+    // troca novamente os quadrantes
+    deslocaDFT(complexImage);
+
+    // calcula a DFT inversa
+    idft(complexImage, complexImage, DFT_SCALE);
+
+    // limpa o array de planos
+    planos.clear();
+
+    // separa as partes real e imaginaria da
+    // imagem filtrada
+    split(complexImage, planos);
+
+    //calcular exponencial
+    exp(planos[0], planos[0]);
+
+    // normaliza a parte real para exibicao
+    normalize(planos[0], planos[0], 0, 1, CV_MINMAX);
+    imshow("filtrada", planos[0]);
+
+    key = (char) waitKey(10);
+    if( key == 27 )
+      break;
+  }
+    planos[0].convertTo(res, CV_8UC1, 255.0);
+    imwrite("ImagemOriginal.png", imagegray);
+    imwrite("filtrada.png", res);
+
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_atividade_11_1">Atividade 11.1</h3>
+        <div class="paragraph">
+          <p>
+            Este algoritmo tem como objetivo usar o exemplo
+            <a href="canny.cpp" class="bare">canny.cpp</a> e
+            <a href="pontilhismo.cpp" class="bare">pontilhismo.cpp</a> para
+            criar um filtro
+            <a href="cannypoints.cpp" class="bare">cannypoints.cpp</a>. A idéia
+            do <a href="cannypoints.cpp" class="bare">cannypoints.cpp</a> é uzar
+            as bordas produzidas pelo algoritmo de Canny para melhorar a
+            qualidade da imagem pontilhista gerada, os programas
+            <a href="canny.cpp" class="bare">canny.cpp</a> e
+            <a href="pontilhismo.cpp" class="bare">pontilhismo.cpp</a> estão
+            mostrados logo abaixo.
+          </p>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte <a href="canny.cpp" class="bare">canny.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include "opencv2/opencv.hpp"
+
+using namespace std;
+using namespace cv;
+
+int top_slider = 10;
+int top_slider_max = 200;
+
+char TrackbarName[50];
+
+Mat image, border;
+
+void on_trackbar_canny(int, void*){
+  Canny(image, border, top_slider, 3*top_slider);
+  imshow("canny", border);
+}
+
+int main(int argc, char**argv){
+  int width, height;
+
+  image= imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+
+  width=image.size().width;
+  height=image.size().height;
+
+  sprintf( TrackbarName, "Threshold inferior", top_slider_max );
+
+  namedWindow("canny",1);
+  createTrackbar( TrackbarName, "canny",
+                &amp;top_slider,
+                top_slider_max,
+                on_trackbar_canny );
+
+  on_trackbar_canny(top_slider, 0 );
+
+  waitKey();
+  imwrite("cannyborders.png", border);
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="pontilhismo.cpp" class="bare">pontilhismo.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;numeric&gt;
+#include &lt;ctime&gt;
+#include &lt;cstdlib&gt;
+
+using namespace std;
+using namespace cv;
+
+#define STEP 5
+#define JITTER 3
+#define RAIO 3
+
+int main(int argc, char** argv){
+  vector&lt;int&gt; yrange;
+  vector&lt;int&gt; xrange;
+
+  Mat image, frame, points;
+
+  int width, height, gray;
+  int x, y;
+
+  image= imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+
+  srand(time(0));
+
+  if(!image.data){
+	cout &lt;&lt; "nao abriu" &lt;&lt; argv[1] &lt;&lt; endl;
+    cout &lt;&lt; argv[0] &lt;&lt; " imagem.jpg";
+    exit(0);
+  }
+
+  width=image.size().width;
+  height=image.size().height;
+
+  xrange.resize(height/STEP);
+  yrange.resize(width/STEP);
+
+  iota(xrange.begin(), xrange.end(), 0);
+  iota(yrange.begin(), yrange.end(), 0);
+
+  for(uint i=0; i&lt;xrange.size(); i++){
+    xrange[i]= xrange[i]*STEP+STEP/2;
+  }
+
+  for(uint i=0; i&lt;yrange.size(); i++){
+    yrange[i]= yrange[i]*STEP+STEP/2;
+  }
+
+  points = Mat(height, width, CV_8U, Scalar(255));
+
+  random_shuffle(xrange.begin(), xrange.end());
+
+  for(auto i : xrange){
+    random_shuffle(yrange.begin(), yrange.end());
+    for(auto j : yrange){
+      x = i+rand()%(2*JITTER)-JITTER+1;
+      y = j+rand()%(2*JITTER)-JITTER+1;
+      gray = image.at&lt;uchar&gt;(x,y);
+      circle(points,
+             cv::Point(y,x),
+             RAIO,
+             CV_RGB(gray,gray,gray),
+             -1,
+             CV_AA);
+    }
+  }
+  imwrite("pontos.jpg", points);
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            A imagem que passou por esse processo de filtragem é a
+            <a href="pontemaua.jpg" class="bare">pontemaua.jpg</a>, mostrada
+            logo abaixo seguida das imagens de saída do programa com três
+            variações de valores do filtro de Canny, para cada imagem das bordas
+            do filtro de Canny temos a respectiva imagem pontilhada baseada na
+            mesma.
+          </p>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="pontemaua.jpg" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 8. Entrada do programa</div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="pontos.jpg" alt="Entrada do Programa" />
+          </div>
+          <div class="title">Figure 9. Saída do programa pontilhismo.cpp</div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="bordasMin.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 10. Bordas para um valor mínimo do filtro de Canny
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="pontosMin.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 11. Saída do programa para um valor mínimo do filtro de Canny
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="bordasMed.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 12. Bordas para um valor médio do filtro de Canny
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="pontosMed.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 13. Saída do programa para um valor médio do filtro de Canny
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="bordasMax.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 14. Bordas para um valor maximo do filtro de Canny
+          </div>
+        </div>
+        <div class="imageblock">
+          <div class="content">
+            <img src="pontosMax.jpg" alt="Saída do Programa" />
+          </div>
+          <div class="title">
+            Figure 15. Saída do programa para um valor maximo do filtro de Canny
+          </div>
+        </div>
+        <div class="paragraph">
+          <p>
+            O código fonte
+            <a href="cannypoints.cpp" class="bare">cannypoints.cpp</a> está
+            mostrado abaixo:
+          </p>
+        </div>
+        <div class="listingblock">
+          <div class="content">
+            <pre>
+#include &lt;iostream&gt;
+#include &lt;opencv2/opencv.hpp&gt;
+#include &lt;fstream&gt;
+#include &lt;iomanip&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;numeric&gt;
+#include &lt;ctime&gt;
+#include &lt;cstdlib&gt;
+
+using namespace std;
+using namespace cv;
+
+#define STEP 3
+#define JITTER 3
+#define RAIO 3
+#define top_slider_max 200
+
+int top_slider = 10;
+int width, height;
+
+char TrackbarName[50];
+
+Mat image, points, border;
+
+void on_trackbar_canny(int, void*){
+  Canny(image, border, top_slider, 3*top_slider);
+  imshow("canny", border);
+}
+
+int main(int argc, char** argv){
+
+  vector&lt;int&gt; yrange;
+  vector&lt;int&gt; xrange;
+
+  int gray, x, y;
+
+  image = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+
+  srand(time(0));
+
+  if(!image.data){
+	cout &lt;&lt; "nao abriu: " &lt;&lt; argv[1] &lt;&lt; endl;
+    cout &lt;&lt; argv[0] &lt;&lt; " imagem.jpg";
+    exit(0);
+  }
+
+  width=image.size().width;
+  height=image.size().height;
+
+  xrange.resize(height/STEP);
+  yrange.resize(width/STEP);
+
+  iota(xrange.begin(), xrange.end(), 0);
+  iota(yrange.begin(), yrange.end(), 0);
+
+  for(uint i=0; i&lt;xrange.size(); i++){
+    xrange[i]= xrange[i]*STEP+STEP/2;
+  }
+
+  for(uint i=0; i&lt;yrange.size(); i++){
+    yrange[i]= yrange[i]*STEP+STEP/2;
+  }
+
+  points = Mat(height, width, CV_8U, Scalar(255));
+
+  random_shuffle(xrange.begin(), xrange.end());
+
+  for(auto i : xrange){
+    random_shuffle(yrange.begin(), yrange.end());
+    for(auto j : yrange){
+      x = i+rand()%(2*JITTER)-JITTER+1;
+      y = j+rand()%(2*JITTER)-JITTER+1;
+      gray = image.at&lt;uchar&gt;(x,y);
+      circle(points,
+             cv::Point(y,x),
+             RAIO,
+             CV_RGB(gray,gray,gray),
+             -1,
+             CV_AA);
+    }
+  }
+
+  sprintf( TrackbarName, "Threshold inferior", top_slider_max );
+
+  namedWindow("canny",1);
+  createTrackbar( TrackbarName, "canny",
+                &amp;top_slider,
+                top_slider_max,
+                on_trackbar_canny );
+
+  on_trackbar_canny(top_slider, 0 );
+
+  waitKey(0);
+
+  imwrite("bordas.jpg", border);
+
+  for(int i = JITTER; i &lt; border.size().width - JITTER; i++){
+    for(int j = JITTER; j &lt; border.size().height - JITTER; j++){
+      if(border.at&lt;uchar&gt;(j,i) == 255){
+        x = i + rand()%(2*JITTER) - JITTER + 1;
+        y = j + rand()%(2*JITTER) - JITTER + 1;
+        gray = image.at&lt;uchar&gt;(x,y);
+        circle(points,
+              cv::Point(y,x),
+              RAIO,
+              CV_RGB(gray,gray,gray),
+              -1,
+              CV_AA);
+      }
+    }
+  }
+
+  imwrite("pontos.jpg", points);
+
+  return 0;
+}</pre
+            >
+          </div>
+        </div>
+      </div>
+      <div class="sect1">
+        <h2 id="_bibliografia">Bibliografia</h2>
+        <div class="sectionbody">
+          <div class="ulist bibliography">
+            <ul class="bibliography">
+              <li>
+                <p>
+                  <a
+                    href="http://docs.opencv.org/2.4/modules/refman.html"
+                    class="bare"
+                    >http://docs.opencv.org/2.4/modules/refman.html</a
+                  >. 'Referência da biblioteca OpenCV.'
+                </p>
+              </li>
+              <li>
+                <p>
+                  <a href="http://www.cplusplus.com" class="bare"
+                    >http://www.cplusplus.com</a
+                  >. 'Principal portal de desenvolvimento e referência para
+                  programação em C++'.
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="footer">
+      <div id="footer-text">Last updated: april 2024</div>
+    </div>
+  </body>
+</html>
